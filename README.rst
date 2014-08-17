@@ -7,7 +7,7 @@ buttons to click with mouse button, not meant to be having complex arithmetic
 operations, just basic ``+-*/``.
 
 .. _Urwid: http://urwid.org/
-.. figure:: c.png
+.. figure:: https://bytebucket.org/livibetter/c/raw/tip/c.png
 
 This project's name is "c," however, in order to register on PyPI_, it uses
 "urcalc" as the PyPI package name. ``c`` is also the command to invoke the
@@ -80,4 +80,4 @@ Copyright
 
 This project is licensed under the MIT License, see COPYING_.
 
-.. _COPYING: COPYING
+.. _COPYING: https://bitbucket.org/livibetter/c/src/tip/COPYING
