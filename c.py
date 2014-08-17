@@ -28,7 +28,7 @@ __module__ = 'c'
 __description__ = 'Simple calculator in terminal using Urwid'
 __copyright__ = 'Copyright 2014, Yu Jie Lin'
 __license__ = 'MIT License'
-__version__ = '0.0.0'
+__version__ = '0.1.0'
 __website__ = 'http://bitbucket.org/livibetter/c'
 
 __author__ = 'Yu-Jie Lin'
