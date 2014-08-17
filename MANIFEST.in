@@ -1,0 +1,7 @@
+include COPYING
+include ChangeLog
+include Makefile
+include NEWS
+include README.rst
+include requirements.txt
+include tests.py
