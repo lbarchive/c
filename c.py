@@ -50,6 +50,7 @@ LAYOUT = tuple(filter(
 PALETTE = [
   (None, 'dark green', 'default'),
   ('focus', 'light red', 'default'),
+  ('blink', 'white', 'default'),
   ('output', 'light blue', 'default'),
 ]
 
@@ -66,6 +67,7 @@ class CButton(urwid.Button):
     w = CBigText(label, urwid.HalfBlock5x4Font())
     self._label = w
     w = urwid.AttrMap(w, None, 'focus')
+    self.__amap = w
     w = urwid.Padding(w, align='center', width='clip')
     w = urwid.Filler(w, valign='middle', bottom=1)
     w = urwid.BoxAdapter(w, height=5)
@@ -75,6 +77,37 @@ class CButton(urwid.Button):
       urwid.connect_signal(self, 'click', on_press)
 
     self.set_label(label)
+
+    self.__loop = None
+    urwid.connect_signal(self, 'click', self.blink_start)
+
+  def enable_blink(self, loop):
+
+    self.__loop = loop
+
+  def blink_start(self, user_data=None):
+
+    if not self.__loop:
+      return
+
+    self.__blink_state = 0
+    self.__loop.set_alarm_in(0, self.__blink)
+
+  def __blink(self, loop, user_data=None):
+
+    self.__blink_state += 1
+
+    self.__amap.set_attr_map({
+      None: None if self.__blink_state % 2 else 'blink'
+    })
+    self.__amap.set_focus_map({
+      None: 'focus' if self.__blink_state % 2 else 'blink'
+    })
+
+    if self.__blink_state < 5:
+      self.__loop.set_alarm_in(0.05, self.__blink)
+    else:
+      self.__blink_state = 0
 
 
 class C():
@@ -94,6 +127,16 @@ class C():
     _btn = lambda btn: CButton(btn, on_press=self.button_keypress)
     _row = lambda btn: _btn(btn) if btn != '---' else urwid.Text('')
     rows = [urwid.Columns(map(_row, row)) for row in LAYOUT]
+    self.buttons = [
+      btn
+      for row in rows
+      for cols in row.contents
+      for btn in cols
+      if isinstance(btn, CButton)
+    ]
+    self.buttons_map = dict(
+      (btn.get_label(), btn) for btn in self.buttons
+    )
 
     self.widget = urwid.Filler(urwid.Pile([top_row] + rows))
 
@@ -119,6 +162,15 @@ class C():
 
     if isinstance(key, tuple) and key[0].startswith('mouse'):
       return False
+
+    if key == 'backspace':
+      key = '<--'
+    elif key == 'esc':
+      key = 'C'
+
+    if key in self.buttons_map:
+      btn = self.buttons_map[key]
+      btn.blink_start()
 
     if '0' <= key <= '9':
       self.c = key if self.c == '0' else self.c + key
@@ -192,6 +244,8 @@ def main():
 
   c = C()
   loop = urwid.MainLoop(c.widget, PALETTE, unhandled_input=c.handle_input)
+  for btn in c.buttons:
+    btn.enable_blink(loop)
   loop.run()
 
 
